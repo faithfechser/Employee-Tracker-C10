@@ -43,31 +43,92 @@ database: 'ETC10-db',
 
 // Department View Function
 function departmentView() {
-    connection.query('SELECT * FROM department', (err, results) => {
-      if (err) throw err;
-      console.table(results);
-      programStart();
-    });
-  }
-  
-  // Profession View Function
-  function professionView() {
-    connection.query('SELECT * FROM profession', (err, results) => {
-      if (err) throw err;
-      console.table(results);
-      programStart();
-    });
-  }
-  
-  // Employee View Function
-  function employeeView() {
-    connection.query('SELECT * FROM employee', (err, results) => {
-      if (err) throw err;
-      console.table(results);
-      programStart();
-    });
-  }
+connection.query('SELECT * FROM department', (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    programStart();
+});
+}
 
+// Profession View Function
+function professionView() {
+connection.query('SELECT * FROM profession', (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    programStart();
+});
+}
+
+// Employee View Function
+function employeeView() {
+connection.query('SELECT * FROM employee', (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    programStart();
+});
+}
+
+// Add department function
+function addDepartment() {
+inquirer
+    .prompt([
+    {
+        type: 'input',
+        name: 'department_name',
+        message: 'Enter the name of the department:',
+    },
+    ])
+    .then((answer) => {
+    connection.query(
+        'INSERT INTO department (department_name) VALUES (?)',
+        [answer.department_name],
+        (err, results) => {
+        if (err) throw err;
+        console.log('Department added successfully!');
+        programStart();
+        }
+    );
+    });
+}
+// Add profession function
+function addProfession() {
+connection.query('SELECT * FROM department', (err, results) => {
+    if (err) throw err;
+    const departments = results.map((department) => department.department_name);
+
+    inquirer
+    .prompt([
+        {
+        type: 'input',
+        name: 'title',
+        message: 'Enter the name of the role:',
+        },
+        {
+        type: 'input',
+        name: 'salary',
+        message: 'Enter the salary for the role:',
+        },
+        {
+        type: 'list',
+        name: 'department',
+        message: 'Select the department for the role:',
+        choices: departments,
+        },
+    ])
+    .then((answers) => {
+        const departmentName = answers.department;
+        connection.query(
+        'INSERT INTO profession (title, salary, department_name) VALUES (?, ?, ?)',
+        [answers.title, answers.salary, departmentName],
+        (err, results) => {
+            if (err) throw err;
+            console.log ('Profession added successfully!');
+            programStart();
+        }
+        );
+    });
+});
+}
 
 
 //   Program Start
