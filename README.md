@@ -23,6 +23,7 @@ The following code will install everything needed for the program's success:
 npm install inquirer
 npm init -y
 npm install inquirer mysql2
+npm console.table
 
 
 ## Credits & Contributions
