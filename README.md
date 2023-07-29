@@ -3,7 +3,7 @@
 
 ## Description
 
-
+This program is meant to view and manage a company's departments, employees, and their roles to assist you in business organisation and planning!
 
 ## Table of Contents
 - [Usage](#usage)
@@ -15,20 +15,23 @@
 
 ## Usage
 
-
+Use this program for the organisation of your business.
 
 ## Installation
 
-Install inquirer with 'npm i inquirer@8.2.4'
+The following code will install everything needed for the program's success:
+npm install inquirer
+npm init -y
+npm install inquirer mysql2
 
 
 ## Credits & Contributions
 
-
+n/a
 
 ## Tests
 
-
+n/a
 
 ## Questions
 
