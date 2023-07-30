@@ -3,6 +3,56 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const consoleTable = require('console.table');
 
+// Program start function
+function programStart() {
+  inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'option',
+        message: 'Select an option:',
+        choices: [
+          'View all departments',
+          'View all professions',
+          'View all employees',
+          'Add a department',
+          'Add a role',
+          'Add an employee',
+          'Update an employee role',
+          'Exit',
+        ],
+      },
+    ])
+    .then((answers) => {
+      switch (answers.option) {
+        case 'View all departments':
+          departmentView();
+          break;
+        case 'View all roles':
+          professionView();
+          break;
+        case 'View all employees':
+          employeeView();
+          break;
+        case 'Add a department':
+          addDepartment();
+          break;
+        case 'Add a profession':
+          addProfession();
+          break;
+        case 'Add an employee':
+          addEmployee();
+          break;
+        case 'Update an employee role':
+          updateEmployeeRole();
+          break;
+        default:
+          connection.end();
+          break;
+      }
+    });
+}
+
 // MySQL connection
 const connection = mysql.createConnection({
 host: 'localhost',
@@ -11,8 +61,13 @@ password: '',
 database: 'ETC10-db',
 });
 
-// console.table(
-//     "\n 
+connection.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to the database!');
+  programStart();
+});
+
+// console.log(JSON.parse(JSON.stringify(
 // █░░░░░░░░░░░░░░█░░░░░░██████████░░░░░░█░░░░░░░░░░░░░░█░░░░░░█████████░░░░░░░░░░░░░░█░░░░░░░░██░░░░░░░░█░░░░░░░░░░░░░░█░░░░░░░░░░░░░░█
 // █░░▄▀▄▀▄▀▄▀▄▀░░█░░▄▀░░░░░░░░░░░░░░▄▀░░█░░▄ ▀▄▀▄▀▄▀▄▀░░█░░▄▀░░█████████░░▄▀▄▀▄▀▄▀▄▀░░█░░▄▀▄▀░░██░░▄▀▄▀░░█░░▄▀▄▀▄▀▄▀▄▀░░█░░▄▀▄▀▄▀▄▀▄▀░░█
 // █░░▄▀░░░░░░░░░░█░░▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀░░█░░▄▀░░░░░░▄▀░░█░░▄▀░░█████████░░▄▀░░░░░░▄▀░░█░░░░▄▀░░██░░▄▀░░░░█░░▄▀░░░░░░░░░░█░░▄▀░░░░░░░░░░█
@@ -38,8 +93,7 @@ database: 'ETC10-db',
 // █████░░▄▀░░█████░░▄▀░░██░░▄▀▄▀▄▀░░█░░▄▀░░██░░▄▀░░█░░▄▀▄▀▄▀▄▀▄▀░░█░░▄▀░░██░░▄▀▄▀░░█░░▄▀▄▀▄▀▄▀▄▀░░█░░▄▀░░██░░▄▀▄▀▄▀░░█
 // █████░░░░░░█████░░░░░░██░░░░░░░░░░█░░░░░░██░░░░░░█░░░░░░░░░░░░░░█░░░░░░██░░░░░░░░█░░░░░░░░░░░░░░█░░░░░░██░░░░░░░░░░█
 // ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-// \n"
-// )
+// )));
 
 // Department View Function
 function departmentView() {
@@ -185,56 +239,58 @@ function addEmployee() {
   });
 }
 
-// Program start function
-function programStart() {
-  inquirer
-    .prompt([
-      {
-        type: 'list',
-        name: 'option',
-        message: 'Select an option:',
-        choices: [
-          'View all departments',
-          'View all professions',
-          'View all employees',
-          'Add a department',
-          'Add a role',
-          'Add an employee',
-          'Update an employee role',
-          'Exit',
-        ],
-      },
-    ])
-    .then((answers) => {
-      switch (answers.option) {
-        case 'View all departments':
-          departmentView();
-          break;
-        case 'View all roles':
-          professionView();
-          break;
-        case 'View all employees':
-          employeeView();
-          break;
-        case 'Add a department':
-          addDepartment();
-          break;
-        case 'Add a profession':
-          addProfession();
-          break;
-        case 'Add an employee':
-          addEmployee();
-          break;
-        case 'Update an employee role':
-          updateEmployeeRole();
-          break;
-        default:
-          connection.end();
-          break;
-      }
+// Insert employee function
+function insertEmployee(firstName, lastName, professionTitle, manager) {
+  connection.query(
+    'INSERT INTO employee (first_name, last_name, profession, manager) VALUES (?, ?, (SELECT id FROM profession WHERE title = ?), ?)',
+    [firstName, lastName, professionTitle, manager],
+    (err, results) => {
+      if (err) throw err;
+      console.log('Employee added successfully!');
+      programStart();
+    }
+  );
+}
+
+
+function updateEmployeeRole() {
+  connection.query('SELECT * FROM employee', (err, results) => {
+    if (err) throw err;
+    const employees = results.map((employee) => employee.first_name);
+
+    connection.query('SELECT * FROM profession', (err, results) => {
+      if (err) throw err;
+      const roles = results.map((role) => role.title);
+
+      inquirer
+        .prompt([
+          {
+            type: 'list',
+            name: 'employee',
+            message: 'Select the employee to update:',
+            choices: employees,
+          },
+          {
+            type: 'list',
+            name: 'role',
+            message: 'Select the new role for the employee:',
+            choices: roles,
+          },
+        ])
+        .then((answers) => {
+          connection.query(
+            'UPDATE employee SET role_id = (SELECT id FROM profession WHERE title = ?) WHERE first_name = ?',
+            [answers.role, answers.employee],
+            (err, results) => {
+              if (err) throw err;
+              console.log('Employee role updated successfully!');
+              programStart();
+            }
+          );
+        });
     });
+  });
 }
   
-
 //   Program Start
 programStart();
