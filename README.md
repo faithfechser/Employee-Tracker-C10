@@ -20,7 +20,7 @@ Use this program for the organisation of your business.
 ## Installation
 
 The following code will install everything needed for the program's success:
-npm install inquirer
+npm i inquirer@8.2.4
 npm init -y
 npm install inquirer mysql2
 npm console.table
