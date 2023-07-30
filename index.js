@@ -131,59 +131,110 @@ function addDepartment() {
 }
 
 function addEmployee() {
-    connection.query('SELECT * FROM profession', (err, results) => {
-      if (err) throw err;
-      const profession = results.map((profession) => profession.title);
-  
-      inquirer
-        .prompt([
-          {
-            type: 'input',
-            name: 'first_name',
-            message: "Enter the employee's first name:",
-          },
-          {
-            type: 'input',
-            name: 'last_name',
-            message: "Enter the employee's last name:",
-          },
-          {
-            type: 'list',
-            name: 'profession',
-            message: "Select the employee's profession:",
-            choices: professions,
-          },
-          {
-            type: 'input',
-            name: 'manager',
-            message: "Enter the employee's manager's first name (or leave blank if none):",
-          },
-        ])
-        .then((answers) => {
-          const professionTitle = answers.profession;
-          let manager = null;
-  
-          if (answers.manager) {
-            const managerName = answers.manager;
-            connection.query(
-              'SELECT * FROM employee WHERE first_name = ?',
-              [managerName],
-              (err, results) => {
-                if (err) throw err;
-  
-                if (results.length > 0) {
-                  manager = results;
-                }
-  
-                insertEmployee(answers.first_name, answers.last_name, Title, manager);
+  connection.query('SELECT * FROM profession', (err, results) => {
+    if (err) throw err;
+    const profession = results.map((profession) => profession.title);
+
+    inquirer
+      .prompt([
+        {
+          type: 'input',
+          name: 'first_name',
+          message: "Enter the employee's first name:",
+        },
+        {
+          type: 'input',
+          name: 'last_name',
+          message: "Enter the employee's last name:",
+        },
+        {
+          type: 'list',
+          name: 'profession',
+          message: "Select the employee's profession:",
+          choices: professions,
+        },
+        {
+          type: 'input',
+          name: 'manager',
+          message: "Enter the employee's manager's first name (or leave blank if none):",
+        },
+      ])
+      .then((answers) => {
+        const professionTitle = answers.profession;
+        let manager = null;
+
+        if (answers.manager) {
+          const managerName = answers.manager;
+          connection.query(
+            'SELECT * FROM employee WHERE first_name = ?',
+            [managerName],
+            (err, results) => {
+              if (err) throw err;
+
+              if (results.length > 0) {
+                manager = results;
               }
-            );
-          } else {
-            insertEmployee(answers.first_name, answers.last_name, Title, manager);
-          }
-        });
+
+              insertEmployee(answers.first_name, answers.last_name, Title, manager);
+            }
+          );
+        } else {
+          insertEmployee(answers.first_name, answers.last_name, Title, manager);
+        }
+      });
+  });
+}
+
+// Program start function
+function programStart() {
+  inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'option',
+        message: 'Select an option:',
+        choices: [
+          'View all departments',
+          'View all professions',
+          'View all employees',
+          'Add a department',
+          'Add a role',
+          'Add an employee',
+          'Update an employee role',
+          'Exit',
+        ],
+      },
+    ])
+    .then((answers) => {
+      switch (answers.option) {
+        case 'View all departments':
+          departmentView();
+          break;
+        case 'View all roles':
+          professionView();
+          break;
+        case 'View all employees':
+          employeeView();
+          break;
+        case 'Add a department':
+          addDepartment();
+          break;
+        case 'Add a profession':
+          addProfession();
+          break;
+        case 'Add an employee':
+          addEmployee();
+          break;
+        case 'Update an employee role':
+          updateEmployeeRole();
+          break;
+        default:
+          connection.end();
+          break;
+      }
     });
-  }
+}
+  
 
 //   Program Start
 programStart();
