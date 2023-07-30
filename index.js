@@ -43,34 +43,34 @@ database: 'ETC10-db',
 
 // Department View Function
 function departmentView() {
-connection.query('SELECT * FROM department', (err, results) => {
-    if (err) throw err;
-    console.table(results);
-    programStart();
-});
+    connection.query('SELECT * FROM department', (err, results) => {
+        if (err) throw err;
+        console.table(results);
+        programStart();
+    });
 }
 
 // Profession View Function
 function professionView() {
-connection.query('SELECT * FROM profession', (err, results) => {
-    if (err) throw err;
-    console.table(results);
-    programStart();
-});
+    connection.query('SELECT * FROM profession', (err, results) => {
+        if (err) throw err;
+        console.table(results);
+        programStart();
+    });
 }
 
 // Employee View Function
 function employeeView() {
-connection.query('SELECT * FROM employee', (err, results) => {
-    if (err) throw err;
-    console.table(results);
-    programStart();
-});
+    connection.query('SELECT * FROM employee', (err, results) => {
+        if (err) throw err;
+        console.table(results);
+        programStart();
+    });
 }
 
 // Add department function
 function addDepartment() {
-inquirer
+    inquirer
     .prompt([
     {
         type: 'input',
@@ -89,10 +89,10 @@ inquirer
         }
     );
     });
-}
-// Add profession function
-function addProfession() {
-connection.query('SELECT * FROM department', (err, results) => {
+    }
+    // Add profession function
+    function addProfession() {
+    connection.query('SELECT * FROM department', (err, results) => {
     if (err) throw err;
     const departments = results.map((department) => department.department_name);
 
@@ -127,9 +127,63 @@ connection.query('SELECT * FROM department', (err, results) => {
         }
         );
     });
-});
+    });
 }
 
+function addEmployee() {
+    connection.query('SELECT * FROM profession', (err, results) => {
+      if (err) throw err;
+      const profession = results.map((profession) => profession.title);
+  
+      inquirer
+        .prompt([
+          {
+            type: 'input',
+            name: 'first_name',
+            message: "Enter the employee's first name:",
+          },
+          {
+            type: 'input',
+            name: 'last_name',
+            message: "Enter the employee's last name:",
+          },
+          {
+            type: 'list',
+            name: 'profession',
+            message: "Select the employee's profession:",
+            choices: professions,
+          },
+          {
+            type: 'input',
+            name: 'manager',
+            message: "Enter the employee's manager's first name (or leave blank if none):",
+          },
+        ])
+        .then((answers) => {
+          const professionTitle = answers.profession;
+          let manager = null;
+  
+          if (answers.manager) {
+            const managerName = answers.manager;
+            connection.query(
+              'SELECT * FROM employee WHERE first_name = ?',
+              [managerName],
+              (err, results) => {
+                if (err) throw err;
+  
+                if (results.length > 0) {
+                  manager = results;
+                }
+  
+                insertEmployee(answers.first_name, answers.last_name, Title, manager);
+              }
+            );
+          } else {
+            insertEmployee(answers.first_name, answers.last_name, Title, manager);
+          }
+        });
+    });
+  }
 
 //   Program Start
 programStart();
