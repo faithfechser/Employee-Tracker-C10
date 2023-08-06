@@ -20,8 +20,8 @@ CREATE TABLE profession (
 CREATE TABLE employee (
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  profession NOT NULL,
-  manager NOT NULL,
+  profession VARCHAR(30) NOT NULL,
+  manager VARCHAR(30),
   FOREIGN KEY (profession) REFERENCES profession(title),
   FOREIGN KEY (manager) REFERENCES employee(first_name)
 );
