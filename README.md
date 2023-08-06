@@ -15,16 +15,13 @@ This program is meant to view and manage a company's departments, employees, and
 
 ## Usage
 
-Use this program for the organisation of your business.
+Use this program for the organisation of your business. Start it up in the index.js terminal and use the command 'node index.js'
 
 ## Installation
 
 The following code will install everything needed for the program's success:
-npm i inquirer@8.2.4
+npm i inquirer@8.2.4 mysql2
 npm init -y
-npm install inquirer mysql2
-npm console.table
-
 
 ## Credits & Contributions
 
