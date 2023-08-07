@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS ETC10-db;
-CREATE database ETC10-db;
+DROP DATABASE IF EXISTS ETC10_db;
+CREATE database ETC10_db;
 
-USE ETC10-db;
+USE ETC10_db;
 
 -- Department table
 CREATE TABLE department (
