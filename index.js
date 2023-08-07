@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'ETC10-db',
+  database: 'ETC10_db',
 });
 
 // Program start function
