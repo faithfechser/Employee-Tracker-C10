@@ -3,25 +3,28 @@ CREATE database ETC10_db;
 
 USE ETC10_db;
 
--- Department table
 CREATE TABLE department (
-  department_name VARCHAR(30) NOT NULL
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(30) UNIQUE NOT NULL
 );
 
--- Profession table
-CREATE TABLE profession (
-  title VARCHAR(30) NOT NULL,
-  salary DECIMAL(10, 2) NOT NULL,
-  department_name(30) NOT NULL,
-  FOREIGN KEY (department_name) REFERENCES department(department_name)
+CREATE TABLE role (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(30) UNIQUE NOT NULL,
+  salary DECIMAL UNSIGNED NOT NULL,
+  department_id INT UNSIGNED NOT NULL,
+  INDEX dep_ind (department_id),
+  CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE CASCADE
 );
 
--- Employee Table
 CREATE TABLE employee (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  profession VARCHAR(30) NOT NULL,
-  manager VARCHAR(30),
-  FOREIGN KEY (profession) REFERENCES profession(title),
-  FOREIGN KEY (manager) REFERENCES employee(first_name)
+  role_id INT UNSIGNED NOT NULL,
+  INDEX role_ind (role_id),
+  CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE,
+  manager_id INT UNSIGNED,
+  INDEX man_ind (manager_id),
+  CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES employee(id) ON DELETE SET NULL
 );
