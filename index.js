@@ -1,13 +1,20 @@
 // Constant dependency variables
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+require('dotenv').config();
 
 // MySQL connection
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: process.env.MYSQL_PASSWORD,
   database: 'ETC10_db',
+});
+// Database connection
+connection.connect(err => {
+  if (err) throw err;
+  console.log('Connected to the database!');
+  programStart();
 });
 
 // Program start function
@@ -20,7 +27,7 @@ function programStart() {
         message: 'Select an option:',
         choices: [
           'View all departments',
-          'View all professions',
+          'View all role',
           'View all employees',
           'Add a department',
           'Add a role',
@@ -30,13 +37,13 @@ function programStart() {
         ],
       },
     ])
-    .then((answers) => {
+    .then(answers => {
       switch (answers.option) {
         case 'View all departments':
           departmentView();
           break;
         case 'View all roles':
-          professionView();
+          roleView();
           break;
         case 'View all employees':
           employeeView();
@@ -44,8 +51,8 @@ function programStart() {
         case 'Add a department':
           addDepartment();
           break;
-        case 'Add a profession':
-          addProfession();
+        case 'Add a role':
+          addRole();
           break;
         case 'Add an employee':
           addEmployee();
@@ -60,11 +67,6 @@ function programStart() {
     });
 }
 
-connection.connect((err) => {
-  if (err) throw err;
-  console.log('Connected to the database!');
-  programStart();
-});
 
 // Department View Function
 function departmentView() {
@@ -75,9 +77,9 @@ function departmentView() {
     });
 }
 
-// Profession View Function
-function professionView() {
-    connection.query('SELECT * FROM profession', (err, results) => {
+// Role View Function
+function roleView() {
+    connection.query('SELECT * FROM role', (err, results) => {
         if (err) throw err;
         console.table(results);
         programStart();
@@ -115,8 +117,8 @@ function addDepartment() {
     );
     });
     }
-    // Add profession function
-    function addProfession() {
+    // Add Role function
+    function addRole() {
     connection.query('SELECT * FROM department', (err, results) => {
     if (err) throw err;
     const departments = results.map((department) => department.department_name);
@@ -143,11 +145,11 @@ function addDepartment() {
     .then((answers) => {
         const departmentName = answers.department;
         connection.query(
-        'INSERT INTO profession (title, salary, department_name) VALUES (?, ?, ?)',
+        'INSERT INTO role (title, salary, department_name) VALUES (?, ?, ?)',
         [answers.title, answers.salary, departmentName],
         (err, results) => {
             if (err) throw err;
-            console.log ('Profession added successfully!');
+            console.log ('Role added successfully!');
             programStart();
         }
         );
@@ -156,9 +158,9 @@ function addDepartment() {
 }
 
 function addEmployee() {
-  connection.query('SELECT * FROM profession', (err, results) => {
+  connection.query('SELECT * FROM role', (err, results) => {
     if (err) throw err;
-    const profession = results.map((profession) => profession.title);
+    const role = results.map((role) => role.title);
 
     inquirer
       .prompt([
@@ -174,9 +176,9 @@ function addEmployee() {
         },
         {
           type: 'list',
-          name: 'profession',
-          message: "Select the employee's profession:",
-          choices: professions,
+          name: 'role',
+          message: "Select the employee's role:",
+          choices: roles,
         },
         {
           type: 'input',
@@ -185,7 +187,7 @@ function addEmployee() {
         },
       ])
       .then((answers) => {
-        const professionTitle = answers.profession;
+        const roleTitle = answers.role;
         let manager = null;
 
         if (answers.manager) {
@@ -200,21 +202,21 @@ function addEmployee() {
                 manager = results;
               }
 
-              insertEmployee(answers.first_name, answers.last_name, Title, manager);
+              insertEmployee(answers.first_name, answers.last_name, roleTitle, manager);
             }
           );
         } else {
-          insertEmployee(answers.first_name, answers.last_name, Title, manager);
+          insertEmployee(answers.first_name, answers.last_name, roleTitle, manager);
         }
       });
   });
 }
 
 // Insert employee function
-function insertEmployee(firstName, lastName, professionTitle, manager) {
+function insertEmployee(firstName, lastName, roleTitle, manager) {
   connection.query(
-    'INSERT INTO employee (first_name, last_name, profession, manager) VALUES (?, ?, (SELECT id FROM profession WHERE title = ?), ?)',
-    [firstName, lastName, professionTitle, manager],
+    'INSERT INTO employee (first_name, last_name, role, manager) VALUES (?, ?, (SELECT id FROM role WHERE title = ?), ?)',
+    [firstName, lastName, roleTitle, manager],
     (err, results) => {
       if (err) throw err;
       console.log('Employee added successfully!');
@@ -229,7 +231,7 @@ function updateEmployeeRole() {
     if (err) throw err;
     const employees = results.map((employee) => employee.first_name);
 
-    connection.query('SELECT * FROM profession', (err, results) => {
+    connection.query('SELECT * FROM role', (err, results) => {
       if (err) throw err;
       const roles = results.map((role) => role.title);
 
@@ -250,7 +252,7 @@ function updateEmployeeRole() {
         ])
         .then((answers) => {
           connection.query(
-            'UPDATE employee SET role_id = (SELECT id FROM profession WHERE title = ?) WHERE first_name = ?',
+            'UPDATE employee SET role_id = (SELECT id FROM role WHERE title = ?) WHERE first_name = ?',
             [answers.role, answers.employee],
             (err, results) => {
               if (err) throw err;
@@ -262,6 +264,3 @@ function updateEmployeeRole() {
     });
   });
 }
-  
-//   Program Start
-programStart();
