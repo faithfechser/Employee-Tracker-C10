@@ -16,6 +16,7 @@ This program is meant to view and manage a company's departments, employees, and
 ## Usage
 
 Use this program for the organisation of your business. Start it up in the index.js terminal and use the command 'node index.js'
+Video: https://drive.google.com/file/d/1LHycFkb8A5c252c2GGU39sB043rxlJ2m/view?usp=sharing
 
 ## Installation
 
