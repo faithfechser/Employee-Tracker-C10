@@ -42,7 +42,7 @@ function programStart() {
         case 'View all departments':
           departmentView();
           break;
-        case 'View all roles':
+        case 'View all role':
           roleView();
           break;
         case 'View all employees':
@@ -107,7 +107,7 @@ function addDepartment() {
     ])
     .then((answer) => {
     connection.query(
-        'INSERT INTO department (department_name) VALUES (?)',
+        'INSERT INTO department (name) VALUES (?)',
         [answer.department_name],
         (err, results) => {
         if (err) throw err;
@@ -178,7 +178,7 @@ function addEmployee() {
           type: 'list',
           name: 'role',
           message: "Select the employee's role:",
-          choices: roles,
+          choices: role,
         },
         {
           type: 'input',
@@ -215,7 +215,7 @@ function addEmployee() {
 // Insert employee function
 function insertEmployee(firstName, lastName, roleTitle, manager) {
   connection.query(
-    'INSERT INTO employee (first_name, last_name, role, manager) VALUES (?, ?, (SELECT id FROM role WHERE title = ?), ?)',
+    'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, (SELECT id FROM role WHERE title = ?), ?)',
     [firstName, lastName, roleTitle, manager],
     (err, results) => {
       if (err) throw err;
